@@ -15,7 +15,6 @@ public class ExecutionResource extends BaseResource {
 
     /**
      *
-     * @param assigneeType
      * @param cycleId
      * @param issues
      * @param projectId
@@ -35,6 +34,17 @@ public class ExecutionResource extends BaseResource {
     }
 
     /**
+     * @param projectId
+     * @param cycleId
+     * @param issues
+     * @return
+     * @throws Exception
+     */
+    public String addTestToCycle(int projectId, int cycleId, String[] issues) throws Exception{
+        return addTestToCycle(projectId, cycleId, issues, -1);
+    }
+
+    /**
      * 获取某个项目和cycle里面的所有用例
      * @param projectId
      * @param cycleId
@@ -47,6 +57,17 @@ public class ExecutionResource extends BaseResource {
         JSONObject jsonObject = JSON.parseObject(content);
         String executions = jsonObject.getString("executions");
         return JSON.parseArray(executions, ExecutionEntity.class);
+    }
+
+    /**
+     * 删除一个execution
+     * @param executionId
+     * @return
+     * @throws Exception
+     */
+    public String delete(int executionId) throws Exception{
+        String uri = String.format("execution/%d", executionId);
+        return delete(uri);
     }
 
 
@@ -64,7 +85,7 @@ public class ExecutionResource extends BaseResource {
     static class IndividualTest{
         int cycleId;
         String[] issues;
-        int method = 1;
+        String method = "1";
         int projectId;
         int versionId = -1;//-1是unreleased
 

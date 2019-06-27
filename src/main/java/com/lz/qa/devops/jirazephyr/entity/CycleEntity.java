@@ -10,13 +10,13 @@ public class CycleEntity {
     private String description;
     private String versionName;
     private Integer sprintId;
-    private Integer versionId;
+    private Integer versionId = -1;//-1是unscheduled
     private String environment;
     private String build;
     private String createdBy;
-    private String name;
+    private String name;//必填
     private String modifiedBy;
     private Integer id;
-    private Integer projectId;
+    private Integer projectId;//必填
     private String startDate;
 }

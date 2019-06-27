@@ -43,6 +43,7 @@ public class BaseResource {
      * @throws Exception
      */
     public String post(String uri, String body) throws Exception{
+        log.info(body);
         return Unirest.post(url + uri).basicAuth(jiraUser,jiraPass).header("content-type", CONTENT_TYPE).body(body).asString().getBody();
     }
 

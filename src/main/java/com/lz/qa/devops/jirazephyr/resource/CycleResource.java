@@ -40,13 +40,20 @@ public class CycleResource extends BaseResource {
     /**
      * 创建一个cycle
      * @param cycleEntity
-     * @return
+     * @return 新创建的cycle的id
      * @throws Exception
      */
     public String createNewCycle(CycleEntity cycleEntity) throws Exception{
         String uri = "cycle";
-        return post(uri, JSON.toJSONString(cycleEntity));
+        String content = post(uri, JSON.toJSONString(cycleEntity));
+        return JSON.parseObject(content).getString("id");
+    }
 
+    public String createCycle(int projectId, String name) throws Exception{
+        CycleEntity cycleEntity = new CycleEntity();
+        cycleEntity.setName(name);
+        cycleEntity.setProjectId(projectId);
+        return createNewCycle(cycleEntity);
     }
 
     /**
@@ -94,5 +101,9 @@ public class CycleResource extends BaseResource {
             }
         }
         return list;
+    }
+
+    public List<ListCycleResultEntity> listUnreleasedCycle(int projectId) throws Exception{
+        return listCycle(projectId, -1);
     }
 }

@@ -3,10 +3,7 @@ package com.lz.qa.devops.jirazephyr.loader;
 import com.lz.qa.devops.jirazephyr.entity.TeststepEntity;
 import com.lz.qa.devops.jirazephyr.resource.TeststepResource;
 import lombok.extern.slf4j.Slf4j;
-import net.rcarz.jiraclient.BasicCredentials;
-import net.rcarz.jiraclient.Issue;
-import net.rcarz.jiraclient.JiraClient;
-import net.rcarz.jiraclient.JiraException;
+import net.rcarz.jiraclient.*;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -128,11 +125,26 @@ public class TestcaseLoader {
     }
 
     Issue createTestcase(String projectKey, String testcaseSummary, String component) throws Exception{
+        createComponent(projectKey, component);
+
         Issue.FluentCreate fluentCreate = jiraClient.createIssue(projectKey.toUpperCase(), "测试").field("summary", testcaseSummary).field("components", Arrays.asList(new String[]{component}));
         if(!StringUtils.isEmpty(testcaseType)){
             fluentCreate.field("labels", Arrays.asList(new String[]{testcaseType}));
         }
         return fluentCreate.execute();
+    }
+
+    /**
+     * 如果component name不存在，先创建component
+     * @param componentName
+     */
+    private void createComponent(String projectKey, String componentName) throws Exception{
+        for(Component component : jiraClient.getProject(projectKey).getComponents()){
+            if(component.getName().equalsIgnoreCase(componentName)){
+                return;
+            }
+        }
+        jiraClient.createComponent(projectKey).name(componentName).execute();
     }
 
     /**
