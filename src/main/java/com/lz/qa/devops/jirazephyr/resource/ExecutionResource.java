@@ -70,6 +70,24 @@ public class ExecutionResource extends BaseResource {
         return delete(uri);
     }
 
+    /**
+     * 更改execution的状态: -1 - 未执行， 1 - 通过， 2 - 失败， 3 - 测试进行中， 4 - 阻止
+     * @param executionId
+     * @param status
+     * @return
+     * @throws Exception
+     */
+    public String update(int executionId, String status) throws Exception{
+        String uri = String.format("execution/%d/execute", executionId);
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("status", status);
+        return put(uri, jsonObject.toJSONString());
+    }
+
+    public String update(int executionId, ExecutionStatus executionStatus) throws Exception{
+        return update(executionId, executionStatus.getStatus());
+    }
+
 
     /**
      * {
