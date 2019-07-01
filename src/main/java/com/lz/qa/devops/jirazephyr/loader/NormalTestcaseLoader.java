@@ -5,6 +5,7 @@ import com.lz.qa.devops.jirazephyr.resource.TeststepResource;
 import lombok.extern.slf4j.Slf4j;
 import net.rcarz.jiraclient.JiraClient;
 import org.apache.commons.lang.StringUtils;
+import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import net.rcarz.jiraclient.Issue;
 @Slf4j
@@ -15,6 +16,35 @@ public class NormalTestcaseLoader extends TestcaseLoader{
 
     public NormalTestcaseLoader(String jiraUrl, String jiraUser, String jiraPass, String excelFileName){
         super(jiraUrl, jiraUser, jiraPass, excelFileName);
+    }
+
+    private TeststepEntity createTeststepEntity(Row row){
+        String step, data, result;
+        try {
+            step = row.getCell(1).getStringCellValue();
+            if(StringUtils.isEmpty(step)){
+                return null;
+            }
+        }catch(Exception e){
+            log.error(e.getMessage(), e);
+            return null;
+        }
+        try{
+            data = row.getCell(2).getStringCellValue();
+        }catch(Exception e){
+            data = "";
+        }
+        try{
+            result = row.getCell(3).getStringCellValue();
+        }catch(Exception e) {
+            result = "";
+        }
+        TeststepEntity entity = new TeststepEntity();
+        entity.setStep(step);
+        entity.setData(data);
+        entity.setResult(result);
+        return entity;
+
     }
 
     /**
@@ -28,6 +58,19 @@ public class NormalTestcaseLoader extends TestcaseLoader{
         String componentName = sheet.getSheetName();
         for(int i = 1; i <= sheet.getLastRowNum();){
             String testCaseSummary = sheet.getRow(i).getCell(0).toString();
+            String priority, assignee;
+            try{
+                priority = sheet.getRow(i).getCell(4).getStringCellValue();
+            }catch(Exception e){
+                log.info("没有指定优先级，采用默认优先级P2");
+                priority = "p2";
+            }
+            try{
+                assignee = sheet.getRow(i).getCell(5).getStringCellValue();
+            }catch(Exception e){
+                log.info("没有指定用例编写人员，采用默认人员");
+                assignee = "qa";
+            }
             Issue issue;
             if(!StringUtils.isEmpty(testCaseSummary)){//一个新的用例
                 try{
@@ -46,35 +89,13 @@ public class NormalTestcaseLoader extends TestcaseLoader{
                 }
 
                 //下面开始创建测试步骤
-                i ++;
+                TeststepEntity teststepEntity;
                 for(;i <= sheet.getLastRowNum();){
-                    if(sheet.getRow(i).getCell(0) == null || StringUtils.isEmpty(sheet.getRow(i).getCell(0).getStringCellValue())){//测试步骤里面的测试名称为空
-                        String step, data, result;
-                        step = data = result = "";
-                        try{
-                            step = sheet.getRow(i).getCell(1).getStringCellValue();
-                        }catch(Exception e){
-                            log.error("测试步骤没有");
-                            log.error(e.getMessage(), e);
+                    if(sheet.getRow(i).getCell(0) == null || StringUtils.isEmpty(sheet.getRow(i).getCell(0).getStringCellValue()) || sheet.getRow(i).getCell(0).getStringCellValue().equalsIgnoreCase(testCaseSummary)){//测试步骤里面的测试名称为空
+                        teststepEntity = createTeststepEntity(sheet.getRow(i));
+                        if(teststepEntity != null) {
+                            teststepResource.create(Integer.valueOf(issue.getId()), teststepEntity);
                         }
-                        try{
-                            data = sheet.getRow(i).getCell(2).getStringCellValue();
-                        }catch(Exception e){
-                            log.info("没有测试数据");
-                        }
-                        try{
-                            result = sheet.getRow(i).getCell(3).getStringCellValue();
-                        }catch(Exception e) {
-                            log.info("没有测试验证");
-                        }
-
-                        TeststepEntity entity = new TeststepEntity();
-                        entity.setStep(step);
-                        entity.setData(data);
-                        entity.setResult(result);
-
-
-                        teststepResource.create(Integer.valueOf(issue.getId()), entity);
 
                         i++;
                     }

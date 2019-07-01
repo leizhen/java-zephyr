@@ -127,7 +127,9 @@ public class TestcaseLoader {
     Issue createTestcase(String projectKey, String testcaseSummary, String component) throws Exception{
         createComponent(projectKey, component);
 
-        Issue.FluentCreate fluentCreate = jiraClient.createIssue(projectKey.toUpperCase(), "测试").field("summary", testcaseSummary).field("components", Arrays.asList(new String[]{component}));
+        Issue.FluentCreate fluentCreate = jiraClient.createIssue(projectKey.toUpperCase(), "测试")
+                .field("summary", testcaseSummary)
+                .field("components", Arrays.asList(new String[]{component}));
         if(!StringUtils.isEmpty(testcaseType)){
             fluentCreate.field("labels", Arrays.asList(new String[]{testcaseType}));
         }
