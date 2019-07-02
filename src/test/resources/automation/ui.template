@@ -1,0 +1,6 @@
+<suite name="标准版进项UI自动化UAT">
+    <listeners>
+        <listener class-name="testngsupport.AnnotationTransformer" />
+    </listeners>
+    {{TEST}}
+</suite>
