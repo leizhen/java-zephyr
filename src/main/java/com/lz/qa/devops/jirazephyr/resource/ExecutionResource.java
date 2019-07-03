@@ -85,7 +85,7 @@ public class ExecutionResource extends BaseResource {
     }
 
     public String update(int executionId, ExecutionStatus executionStatus) throws Exception{
-        return update(executionId, executionStatus.getStatus());
+        return update(executionId, "" + executionStatus.getStatus());
     }
 
 

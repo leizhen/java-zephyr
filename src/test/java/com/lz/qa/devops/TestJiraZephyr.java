@@ -16,25 +16,32 @@ public class TestJiraZephyr {
 
     @Test
     public void f() throws Exception{
-
+        int total = 0;
+        int totalExecuted = 0;
 
         CycleResource cycleResource = new CycleResource(jiraUrl, jiraUser, jiraPassword);
         ExecutionResource executionResource = new ExecutionResource(jiraUrl, jiraUser, jiraPassword);
-        for(ListCycleResultEntity entity : cycleResource.listUnreleasedCycle(10418)){
+        for(ListCycleResultEntity entity : cycleResource.findCycleByVersionName(10419, "v0.4")){
             log.info(entity.getName());
             for(ExecutionEntity eentity:executionResource.executionList(entity.getProjectId(), entity.getCycleId())){
-                log.info(eentity.getSummary());
-                int executionId = eentity.getId();
-                executionResource.update(executionId, ExecutionStatus.PASS);
-                break;
+                log.info(eentity.getSummary() + " " + eentity.getExecutionStatus());
+                if(eentity.getExecutionStatus().equalsIgnoreCase("1")){
+                    totalExecuted ++;
+                }
+
             }
+     total += entity.getTotalCycleExecutions();
+
+
+            log.info("总共{}条用例，执行{}条", total, totalExecuted);
         }
     }
 
     @Test
     public void f2() throws Exception{
         CycleResource cycleResource = new CycleResource(jiraUrl, jiraUser, jiraPassword);
-        log.info(cycleResource.createCycle(10418, "automation-heihei"));
+        //log.info(cycleResource.createCycle(10418, "automation-heihei"));
+        cycleResource.findCycleByVersionName(10419,"v0.4");
     }
 
 }

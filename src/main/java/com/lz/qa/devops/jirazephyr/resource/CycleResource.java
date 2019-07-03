@@ -1,13 +1,16 @@
 package com.lz.qa.devops.jirazephyr.resource;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.lz.qa.devops.jirazephyr.entity.CycleEntity;
 import com.lz.qa.devops.jirazephyr.entity.ListCycleResultEntity;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 public class CycleResource extends BaseResource {
     public CycleResource(String jiraUrl, String jiraUser, String jiraPass){
         super(jiraUrl, jiraUser, jiraPass);
@@ -105,5 +108,32 @@ public class CycleResource extends BaseResource {
 
     public List<ListCycleResultEntity> listUnreleasedCycle(int projectId) throws Exception{
         return listCycle(projectId, -1);
+    }
+
+    public List<ListCycleResultEntity> findCycleByVersionName(int projectId, String versionName) throws Exception{
+        List<ListCycleResultEntity> list = new ArrayList<ListCycleResultEntity>();
+        String uri = String.format("cycle?projectId=%d&versionId=&id=&offset=&issueId=&expand=", projectId);
+        String content = get(uri);
+        JSONObject jsonObject = JSON.parseObject(content);
+        for(String key : jsonObject.keySet()){
+            String subContent = jsonObject.getString(key);
+            for(String s : JSON.parseArray(subContent, String.class)){
+                JSONObject j = JSON.parseObject(s);
+                for(String k : j.keySet()){
+                    if("recordsCount".equalsIgnoreCase(k)){
+                        continue;
+                    }
+                    else{
+                        ListCycleResultEntity entity = JSON.parseObject(j.getString(k), ListCycleResultEntity.class);
+                        entity.setCycleId(Integer.valueOf(k));
+                        if(entity.getVersionName().equalsIgnoreCase(versionName)){
+                            log.info("添加{}到{}", entity.getName(), versionName);
+                            list.add(entity);
+                        }
+                    }
+                }
+            }
+        }
+        return list;
     }
 }
