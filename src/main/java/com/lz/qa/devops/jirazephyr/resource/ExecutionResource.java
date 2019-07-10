@@ -6,6 +6,7 @@ import com.lz.qa.devops.jirazephyr.entity.ExecutionEntity;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ExecutionResource extends BaseResource {
@@ -57,6 +58,24 @@ public class ExecutionResource extends BaseResource {
         JSONObject jsonObject = JSON.parseObject(content);
         String executions = jsonObject.getString("executions");
         return JSON.parseArray(executions, ExecutionEntity.class);
+    }
+
+    /**
+     * 获取某个cycle里面所有的自动化测试用例
+     * @param projectId
+     * @param cycleId
+     * @return
+     * @throws Exception
+     */
+    public List<ExecutionEntity> automationExecutionList(int projectId, int cycleId) throws Exception{
+        List<ExecutionEntity> list = executionList(projectId, cycleId);
+        List<ExecutionEntity> automationList = new ArrayList<ExecutionEntity>();
+        for(ExecutionEntity entity : list){
+            if(entity.getLabel().contains("自动化")){
+                automationList.add(entity);
+            }
+        }
+        return automationList;
     }
 
     /**
