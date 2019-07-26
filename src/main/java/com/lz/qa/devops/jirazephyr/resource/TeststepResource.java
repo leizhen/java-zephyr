@@ -54,6 +54,10 @@ public class TeststepResource extends BaseResource {
         return list(issueId, 0, 100);
     }
 
+    public List<TeststepEntity> list(String issueId) throws Exception{
+        return list(Integer.valueOf(issueId));
+    }
+
     /**
      * 创建测试步骤
      * @param issueId
