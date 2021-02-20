@@ -11,7 +11,7 @@ import org.testng.annotations.Test;
 @Slf4j
 public class TestJiraZephyr {
     String jiraUrl = "http://192.168.10.31:8080/";
-    String jiraUser = "leizhen";
+    String jiraUser = "leizhens";
     String jiraPassword = "f4go48";
 
     @Test
